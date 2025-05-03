@@ -70,7 +70,7 @@ TRUSTBOX is a secure and anonymous reporting system designed for students to rep
 The interface is clean, responsive, and uses localStorage for complaint storage (demo purpose). A full version would integrate secure backend services with encrypted data handling.
 
 ## Video Explanation
-[Click here to watch the demo](https://youtu.be/2ea90_PFw8Y)  
+[Click here to watch the video explanation](https://youtu.be/2ea90_PFw8Y)  
 
 ## Technologies Used
 - **Frontend:** HTML, CSS, JavaScript
