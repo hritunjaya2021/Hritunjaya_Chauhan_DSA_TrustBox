@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TRUSTBOX - Anonymous Reporting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #191314, #332529);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #ccc;
+    }
+
+    .container {
+      background: #191314;
+      border: 1px solid #4d383e;
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 0 20px rgba(77, 56, 62, 0.5);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #dddddd;
+    }
+
+    h3 {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #aaa;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background: #332529;
+      color: #eee;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transition: all 0.3s;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #888;
+    }
+
+    input:focus, textarea:focus {
+      background: #4d383e;
+    }
+
+    button {
+      background: linear-gradient(135deg, #4d383e, #664a52);
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #664a52, #4d383e);
+      transform: scale(1.05);
+    }
+
+    .complaint {
+      background: #332529;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #4d383e;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      color: #bbb;
+      transition: transform 0.3s ease;
+    }
+
+    .complaint:hover {
+      transform: translateY(-5px);
+    }
+
+    #userSection, #adminSection, #complaintSection, #adminView {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>TRUSTBOX</h2>
+
+    <div id="home">
+      <button onclick="showUser()">Login as User</button>
+      <button onclick="showAdmin()">Login as Admin</button>
+    </div>
+
+    <div id="userSection">
+      <h3>User Login</h3>
+      <input type="email" id="email" placeholder="Enter your college email">
+      <button onclick="sendOTP()">Send OTP</button>
+      <input type="text" id="otp" placeholder="Enter OTP">
+      <button onclick="verifyOTP()">Login</button>
+    </div>
+
+    <div id="complaintSection">
+      <h3>Submit Complaint</h3>
+      <textarea id="complaint" placeholder="Write your complaint here..." rows="5"></textarea>
+      <button onclick="submitComplaint()">Submit Complaint</button>
+      <button onclick="goHome()">Back to Home</button>
+    </div>
+
+    <div id="adminSection">
+      <h3>Admin Login</h3>
+      <input type="password" id="adminPass" placeholder="Enter Admin Password">
+      <button onclick="viewComplaints()">View Complaints</button>
+      <button onclick="goHome()">Back to Home</button>
+    </div>
+
+    <div id="adminView">
+      <h3>All Complaints</h3>
+      <div id="complaintsList"></div>
+      <button onclick="clearComplaints()" style="background-color: #991111;">Clear All Complaints</button>
+      <button onclick="goHome()">Back to Home</button>
+    </div>
+  </div>
+
+  <script>
+    let generatedOTP = "";
+    let currentAnonID = "";
+
+    function showUser() { toggleSections('userSection'); }
+    function showAdmin() { toggleSections('adminSection'); }
+    function goHome() {
+      toggleSections('home');
+      generatedOTP = "";
+      currentAnonID = "";
+    }
+
+    function toggleSections(showId) {
+      ['home', 'userSection', 'adminSection', 'complaintSection', 'adminView'].forEach(id => {
+        document.getElementById(id).style.display = (id === showId) ? 'block' : 'none';
+      });
+    }
+
+    function sendOTP() {
+      const email = document.getElementById('email').value.trim();
+      if (!email) return alert('Please enter your email.');
+      if (!email.includes('@krmu')) return alert('Invalid email. Use your college email (@krmu).');
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      alert(`OTP sent to ${email} [simulated]: ${generatedOTP}`);
+    }
+
+    function verifyOTP() {
+      const enteredOTP = document.getElementById('otp').value;
+      if (enteredOTP === generatedOTP) {
+        currentAnonID = 'anon-' + Math.random().toString(36).substring(2, 8);
+        alert('Login successful! Your Anonymous ID: ' + currentAnonID);
+        toggleSections('complaintSection');
+      } else {
+        alert('Invalid OTP. Try again.');
+      }
+    }
+
+    function submitComplaint() {
+      const complaint = document.getElementById('complaint').value.trim();
+      if (!complaint) return alert('Please write your complaint.');
+      const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+      complaints.push({ id: currentAnonID, text: complaint });
+      localStorage.setItem('complaints', JSON.stringify(complaints));
+      alert('Complaint submitted successfully!');
+      document.getElementById('complaint').value = '';
+      goHome();
+    }
+
+    function viewComplaints() {
+      const password = document.getElementById('adminPass').value;
+      if (password !== 'admin123') return alert('Wrong Password!');
+      const complaints = JSON.parse(localStorage.getItem('complaints')) || [];
+      const container = document.getElementById('complaintsList');
+      container.innerHTML = '';
+      if (complaints.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888;">No complaints found.</p>';
+        return;
+      }
+      const complaintMap = new Map();
+      const userMap = {};
+      complaints.forEach(c => {
+        const key = c.text.trim().toLowerCase();
+        if (!complaintMap.has(key)) complaintMap.set(key, new Set());
+        complaintMap.get(key).add(c.id);
+        if (!userMap[c.id]) userMap[c.id] = {};
+        userMap[c.id][key] = (userMap[c.id][key] || 0) + 1;
+      });
+      complaints.forEach(c => {
+        const key = c.text.trim().toLowerCase();
+        const users = complaintMap.get(key).size;
+        const repeats = userMap[c.id][key];
+        let status = 'Normal';
+        if (users > 1) status = '🚨 Priority';
+        else if (repeats > 1) status = '⚠️ Suspicious';
+        const div = document.createElement('div');
+        div.className = 'complaint';
+        div.innerHTML = `<strong>${c.id}</strong><br>${c.text}<br><em>Status: ${status}</em>`;
+        container.appendChild(div);
+      });
+      toggleSections('adminView');
+    }
+
+    function clearComplaints() {
+      if (confirm("Are you sure you want to delete all complaints? This cannot be undone.")) {
+        localStorage.removeItem('complaints');
+        alert("All complaints cleared.");
+        document.getElementById('complaintsList').innerHTML = '';
+      }
+    }
+  </script>
+</body>
+</html>
