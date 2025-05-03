@@ -99,7 +99,7 @@ The interface is clean, responsive, and uses localStorage for complaint storage 
 ### Steps to Execute
 1. **Download or Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/trustbox.git
+   git clone https://github.com/your-username/Hritunjaya_Chauhan_DSA_TrustBox.git
 2. **Open the Project**
 - Navigate to the folder where trustbox1.html is saved.
 - Double-click the trustbopx1.html file to open it in your browser.
